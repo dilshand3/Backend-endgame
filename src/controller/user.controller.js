@@ -4,21 +4,36 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnClodinary } from "../utils/cloudinary.js";
 
+// const generateAccessAndRefreshTokens = async (userId) => {
+//     try {
+//         const user = await User.findById(userId)
+//         const accessToken = await user.generateAccessToken()
+//         const refreshToken = await user.generateRefreshToken()
+
+//         user.refreshToken = refreshToken
+//         await user.save({ validateBeforeSave: false })
+
+//         return { accessToken, refreshToken }
+
+//     } catch (error) {
+//         throw new ApiError(500, "Unable to generate access and refresh token")
+//     }
+// }
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
-        const user = await User.findById(userId)
-        const accessToken = await user.generateAccessToken()
-        const refreshToken = await user.generateRefreshToken()
-
-        user.refreshToken = refreshToken
-        await user.save({ validateBeforeSave: false })
-
-        return { accessToken, refreshToken }
-
+      const user = await User.findById(userId)
+      const accessToken = await user.generateAccessToken()
+      const refreshToken = await user.generateRefreshToken()
+      
+  
+      user.refreshToken = refreshToken;
+      await user.save({ validateBeforeSave: false })
+      return { accessToken, refreshToken }
     } catch (error) {
-        throw new ApiError(500, "Unable to generate access and refresh token")
+      throw new ApiError(501, "something went wrong while generating access and refresh tokens")
     }
-}
+  }
+  
 
 const registerUser = asyncHandler(async (req, res) => {
     const { username, fullName, email, password } = req.body;
@@ -129,7 +144,7 @@ const logOutUser = asyncHandler(async (req, res) => {
         req.user._id,
         {
             $set: {
-                refreshToken: undefined
+                refreshToken: ""
             }
         },
         {
